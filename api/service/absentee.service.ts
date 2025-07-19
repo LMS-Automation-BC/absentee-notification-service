@@ -18,12 +18,40 @@ const attendance_records = (classid, sessionid) =>
   `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions/${sessionid}/user_attendance?api_key=${api_key}`;
 
 export async function getAttendance() {
-  let classesResponse = await (await fetch(classes)).json();
+  let classesResponse = await fetch(classes).then((response)=> {
+      if (response.ok) {
+    return response.json();
+  }
+  throw new Error('could not get classes');
+
+    }).catch((error) => {
+  console.log(error);throw new Error('could not get classes');
+});
+  console.log('class response');
+  console.log(classesResponse)
   let absentRecord:any[] =[];
   for (const classData of classesResponse){
-    let sessionsResponse  = await (await  fetch(attendance_sessions(classData.id))).json(); 
+    let sessionsResponse  = await  fetch(attendance_sessions(classData.id)).then((response)=> {
+      if (response.ok) {
+    return response.json();
+  }
+  throw new Error('could not get sessiolns');
+
+    }).catch((error) => {
+  console.log(error);throw new Error('could not get sessiolns');
+});
+    console.log(sessionsResponse)
     for (const session of sessionsResponse){
-        let records = await (await fetch(attendance_records(classData.id,session.id))).json()
+        let records =await fetch(attendance_records(classData.id,session.id)).then((response)=> {
+      if (response.ok) {
+    return response.json();
+  }
+  throw new Error('could not find attendance records');
+
+    }).catch((error) => {
+  console.log(error)
+  throw new Error('could not find attendance records');
+});
         
         for(const record of records){
             if(record.status === 'Absent'){
