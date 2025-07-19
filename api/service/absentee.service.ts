@@ -1,9 +1,10 @@
-import {DateTime} from 'luxon'
+import {DateTime} from 'luxon';
+import * as fs from 'fs';
 const api_key = "6984896035c60de3c3d5d9c23a7aa645675997e4aa9c3fb72e67";
-//const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"contains":{"tags":["active"]}}`;
-const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"name": "TEST TEST TEST Course"}`;
+const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"contains":{"tags":["active"]}}`;
+//const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"name": "TEST TEST TEST Course"}`;
 const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 2);
+yesterday.setDate(yesterday.getDate() - 10);
 // const attendance_sessions = (classid) =>
 //   `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions?api_key=${api_key}&$filter={"and":[{"gte":{"started_at":"${DateTime.fromJSDate(
 //     yesterday
@@ -29,17 +30,34 @@ export async function getAttendance() {
             record['className'] = classData.name;
             let userData = await (await fetch(user(record.user_id))).json();
             record['firstName']= userData.first_name;
-            record['lastName'] = userData.lastName;
+            record['lastName'] = userData.last_name;
             record['email'] = userData.email;
-            record['sessionDate'] = session.started_at;
+            record['sessionDate'] = DateTime.fromISO(session.started_at).toFormat('dd-MM-yyyy');
             absentRecord.push(record);
             }
         }
     }
   }
-  console.log(absentRecord)
   return absentRecord;
  //savecsv(absentRecord)
 
+}
+export function savecsv(data) {
+  const headers = Object.keys(data[0]);
+  const csvRows = [headers.join(",")];
+  data.forEach((item) => {
+    const row = headers.map((field) => {
+      let value = item[field];
+      if (typeof value === "string") {
+        // Escape double quotes in values
+        value = `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    });
+    csvRows.push(row.join(","));
+  });
+  //fs.writeFileSync(`${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}-${new Date().getHours()}-${new Date().getMinutes()}.csv`, csvRows.join('\n'), 'utf8');
+  console.log('CSV file saved as output.csv');
+  return csvRows.join('\n');
 }
 
