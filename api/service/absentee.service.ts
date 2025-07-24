@@ -1,7 +1,7 @@
 import {DateTime} from 'luxon';
 import * as fs from 'fs';
 const api_key = "6984896035c60de3c3d5d9c23a7aa645675997e4aa9c3fb72e67";
-const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"contains":{"tags":["active"]}}`;
+const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"contains":{"tags":["active"]}}&$limit=100`;
 //const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"name": "TEST TEST TEST Course"}`;
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 10);
