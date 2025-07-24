@@ -36,13 +36,12 @@ export async function getAttendance() {
         return response.json();
       }
 
-      throw new Error('could not get sessiolns:' + JSON.stringify(classData));
+      throw new Error('could not get sessiolns:' + classData.name);
 
     }).catch((error) => {
-      console.log(error); return { error: 'Could not get sessions' };
+      console.log(error); return { error: `${classData.name} ${error}` };
     });
-    console.log(sessionsResponse)
-
+    if (sessionsResponse.error) continue;
     for (const session of sessionsResponse) {
       if (!session.error) {
         let records = await fetch(attendance_records(classData.id, session.id)).then((response) => {
@@ -56,7 +55,7 @@ export async function getAttendance() {
           //throw new Error('could not find attendance records');
           return { error:'could not find attendance records'}
         });
-        if(!records.error){
+        if(records.error) continue;
         for (const record of records) {
           if (record.status !== 'OnTime') {
             record['className'] = classData.name;
@@ -69,7 +68,6 @@ export async function getAttendance() {
           }
         
         }
-      }
       }
     }
   }
