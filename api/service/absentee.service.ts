@@ -1,60 +1,22 @@
 import { DateTime } from 'luxon';
 import * as fs from 'fs';
-const api_key = "6984896035c60de3c3d5d9c23a7aa645675997e4aa9c3fb72e67";
-const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"contains":{"tags":["active"]}}&$limit=100`;
-//const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_key}&$filter={"name": "Assistive Technology and Principles of Universal Design - July/Aug 2025 (WE - Morning)"}`;
-const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 10);
-// const attendance_sessions = (classid) =>
-//   `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions?api_key=${api_key}&$filter={"and":[{"gte":{"started_at":"${DateTime.fromJSDate(
-//     yesterday
-//   ).toISO()}"}}
-//   ,{"lte":{"finished_at":"${DateTime.fromJSDate(new Date()).toISO()}"}}
-//   ]}`;
-const user = userid => `https://brookescollege.neolms.com/api/v3//users/${userid}?api_key=${api_key}`
-const attendance_sessions = (classid) =>
-  `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions?api_key=${api_key}&$filter={"gte":{"started_at":"${DateTime.fromJSDate(yesterday).toISO()}"}}&$limit=100`;
-const attendance_records = (classid, sessionid) =>
-  `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions/${sessionid}/user_attendance?api_key=${api_key}&$limit=100`;
+import { getClasses } from '../lms-fetch/classes';
+import { getAttendanceSessions } from '../lms-fetch/attendanceSessions';
+import {attendance_records, user} from '../constants';
+import { getAttendanceRecords } from '../lms-fetch/attendanceRecords';
 
 export async function getAttendance() {
-  let classesResponse = await fetch(classes).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error('could not get classes');
-
-  }).catch((error) => {
-    console.log(error); throw new Error('could not get classes');
-  });
-  console.log('class response');
-  console.log(classesResponse)
+   let totalcalls = 0;
+  let classesResponse = await getClasses().then(res => res).catch(err => {throw new Error(err.message)});
+  totalcalls++;
   let absentRecord: any[] = [];
   for (const classData of classesResponse) {
-    let sessionsResponse = await fetch(attendance_sessions(classData.id)).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-
-      throw new Error('could not get sessiolns:' + classData.name);
-
-    }).catch((error) => {
-      console.log(error); return { error: `${classData.name} ${error}` };
-    });
+    let sessionsResponse = await getAttendanceSessions(classData);
+    totalcalls++;
     if (sessionsResponse.error) continue;
     for (const session of sessionsResponse) {
-      if (!session.error) {
-        let records = await fetch(attendance_records(classData.id, session.id)).then((response) => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error('could not find attendance records');
-
-        }).catch((error) => {
-          console.log(error)
-          //throw new Error('could not find attendance records');
-          return { error:'could not find attendance records'}
-        });
+        let records = await getAttendanceRecords(classData.id, session.id, session.name);
+        totalcalls++;
         if(records.error) continue;
         for (const record of records) {
           if (record.status !== 'OnTime') {
@@ -66,13 +28,11 @@ export async function getAttendance() {
             record['sessionDate'] = DateTime.fromISO(session.started_at).toFormat('dd-MM-yyyy');
             absentRecord.push(record);
           }
-        
-        }
-      }
+        } 
     }
   }
+  console.log('totalcalls'+totalcalls)
   return absentRecord;
-  //savecsv(absentRecord)
 
 }
 export function savecsv(data) {
@@ -89,8 +49,6 @@ export function savecsv(data) {
     });
     csvRows.push(row.join(","));
   });
-  //fs.writeFileSync(`${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}-${new Date().getHours()}-${new Date().getMinutes()}.csv`, csvRows.join('\n'), 'utf8');
-  console.log('CSV file saved as output.csv');
   return csvRows.join('\n');
 }
 
