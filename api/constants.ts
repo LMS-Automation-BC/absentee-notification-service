@@ -5,8 +5,8 @@ const classes = `https://brookescollege.neolms.com/api/v3/classes?api_key=${api_
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 2);
 const user = userid => `https://brookescollege.neolms.com/api/v3//users/${userid}?api_key=${api_key}`
-const attendance_sessions = (classid) =>
-  `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions?api_key=${api_key}&$filter={"gte":{"started_at":"${DateTime.fromJSDate(yesterday).toISO()}"}}&$limit=100`;
+const attendance_sessions = (classid, start, end) =>
+  `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions?api_key=${api_key}&$filter={"and":[{"gte":{"started_at":"${start}"}},{"lte":{"started_at":"${end}"}}]}&$limit=100`;
  const attendance_records = (classid, sessionid) =>
   `https://brookescollege.neolms.com/api/v3/classes/${classid}/attendance_sessions/${sessionid}/user_attendance?api_key=${api_key}&$limit=100`;
 
