@@ -4,15 +4,15 @@ import { getAttendanceSessions } from '../lms-fetch/attendanceSessions';
 import {attendance_records, user} from '../constants';
 import { getAttendanceRecords } from '../lms-fetch/attendanceRecords';
 
-export async function getAttendance(date:string) {
+export async function getAttendance(date:string, startDate:string, endDate:string) {
    let totalcalls = 0;
   let classesResponse = await getClasses().then(res => res).catch(err => {throw new Error(err.message)});
   totalcalls++;
   let absentRecord: any[] = [];
   for (const classData of classesResponse) {
-    let sessionsResponse = await getAttendanceSessions(classData,date);
+    let sessionsResponse = await getAttendanceSessions(classData,date,startDate,endDate);
     totalcalls++;
-    console.log(sessionsResponse);
+    //console.log(sessionsResponse);
     if (sessionsResponse.error) continue;
     for (const session of sessionsResponse) {
         let records = await getAttendanceRecords(classData.id, session.id, session.name);
