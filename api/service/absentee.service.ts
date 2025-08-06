@@ -36,6 +36,7 @@ export async function getAttendance(date:string, startDate:string, endDate:strin
 
 }
 export function savecsv(data) {
+  //console.log(data)
   const headers = Object.keys(data[0]);
   const csvRows = [headers.join(",")];
   data.forEach((item) => {
