@@ -20,7 +20,7 @@ export async function getAttendanceSessions(classData: any, date:string, startDa
       console.log(error); return { error: `${error.message}` };
     });
 }
-function createDateObject(date:string){
+export function createDateObject(date:string){
   let dateData =date.split('-');
   return (new Date(parseInt(dateData[0]), parseInt(dateData[1])-1, parseInt(dateData[2])))
 }
