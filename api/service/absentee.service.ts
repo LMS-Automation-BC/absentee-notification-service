@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { getClasses } from '../lms-fetch/classes';
-import { getAttendanceSessions } from '../lms-fetch/attendanceSessions';
+import { createDateObject, getAttendanceSessions } from '../lms-fetch/attendanceSessions';
 import {attendance_records, user} from '../constants';
 import { getAttendanceRecords } from '../lms-fetch/attendanceRecords';
 
@@ -25,7 +25,7 @@ export async function getAttendance(date:string, startDate:string, endDate:strin
             record['firstName'] = userData.first_name;
             record['lastName'] = userData.last_name;
             record['email'] = userData.email;
-            record['sessionDate'] = session.started_at;
+            record['sessionDate'] = createDateObject(session.started_at);
             absentRecord.push(record);
           }
         } 

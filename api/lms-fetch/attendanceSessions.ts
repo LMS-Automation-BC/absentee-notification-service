@@ -21,6 +21,10 @@ export async function getAttendanceSessions(classData: any, date:string, startDa
     });
 }
 export function createDateObject(date:string){
-  let dateData =date.split('-');
+  let dateData:string[] =[]
+  if(date.indexOf('T') >0){
+    date = date.split('T')[0]
+  }
+   dateData =date.split('-');
   return (new Date(parseInt(dateData[0]), parseInt(dateData[1])-1, parseInt(dateData[2])))
 }
