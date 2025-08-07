@@ -25,7 +25,7 @@ export async function getAttendance(date:string, startDate:string, endDate:strin
             record['firstName'] = userData.first_name;
             record['lastName'] = userData.last_name;
             record['email'] = userData.email;
-            record['sessionDate'] = createDateObject(session.started_at);
+            record['sessionDate'] = session.started_at.split('T')[0];
             absentRecord.push(record);
           }
         } 
