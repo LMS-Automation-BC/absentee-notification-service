@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import enroll from './service/enroll.service';
+import enroll from '../service/enroll.service';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   //const { name = 'World' } = req.query
