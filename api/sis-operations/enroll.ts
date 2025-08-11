@@ -8,7 +8,7 @@ export default async function enrollStudent(enrollmentData: enrollment, student3
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         myHeaders.append("Authorization", class365.key);
 
-        let academics = await getACDAssessmentData();
+        let academics = await getACDAssessmentData(0);
         const urlencoded = new URLSearchParams();
         urlencoded.append("acds_id", academics.acd.toString());
         urlencoded.append("student_id", student365Id);
