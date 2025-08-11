@@ -1,8 +1,7 @@
 import { updateLMSUser } from "../lms-operations/user";
-import { getACDAssessmentData } from "../api/sis-operations/assessmentData";
-import enrollStudent from "../api/sis-operations/enroll";
-import addStudentData, { getStudentData } from "../api/sis-operations/student";
-import { enrollment } from "../api/types/enrollment-sis";
+import enrollStudent from "../sis-operations/enroll";
+import addStudentData, { getStudentData } from "../sis-operations/student";
+import { enrollment } from "../types/enrollment-sis";
 
 export default async function enroll(student:enrollment){
     let student365= await getStudentData(student.student_id) as any;
