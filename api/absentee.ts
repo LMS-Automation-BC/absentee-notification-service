@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { getAttendance, savecsv } from './service/absentee.service'
+import { getAttendance, savecsv } from '../service/absentee.service'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   let absentees = await getAttendance(req.query?.date as string ||'',req.query?.startDate as string ||'',req.query?.endDate as string ||'').catch(err => err);
